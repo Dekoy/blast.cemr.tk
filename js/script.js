@@ -34,7 +34,7 @@ $(document).ready(function () {
         //searchCells(n, max, row);
         //searchCells(n, max, column);
         let arCells = searchCells(n);
-        let proverka = deletCells(arCells);
+        let addCells = deletCells(arCells);
         // searchCells;
         console.log(arCells);
     };
@@ -102,9 +102,17 @@ $(document).ready(function () {
             for (let i = 0; i < maxCells; i++) {
                 let start = arCells[i];
 
-                let deletCell = $('img[data-id="' + start + '"]').attr("src", "null").attr("data-color", "null");
+                let deletCell = $('img[data-id="' + start + '"]').attr("src", "images/null.jpg")
+                    .attr("data-color", "null");
                 $("#box_cell").append(deletCell);
             }
+            let $sort = $('#box_cell');
+
+            $sort.find('img').sort(function (a, b) {
+                return +a.dataset.id - +b.dataset.id;
+            })
+                .appendTo($sort);
+
             console.log(maxCells);
             // return deletCell;
         }
