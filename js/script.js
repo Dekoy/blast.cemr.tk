@@ -1,4 +1,4 @@
-$(document).ready(function() {
+$(document).ready(function () {
     let clickImg, searchCells;
     let row = 3, column = 4;
 
@@ -33,21 +33,24 @@ $(document).ready(function() {
 
         //searchCells(n, max, row);
         //searchCells(n, max, column);
-        searchCells(n, mainX, mainY);
+        let arCells = searchCells(n);
+        let proverka = deletCells(arCells);
+        // searchCells;
+        console.log(arCells);
     };
 
-    searchCells = function (n, mainX, mainY) {
+    searchCells = function (n) {
         let bingoCells = new Array(n);//$(n);
-        let account = 0,
-            end = +n + 1;
+        let account = 0;
         let start = bingoCells[account];
 
-        while(bingoCells[account] != end ) {
+        while (bingoCells[account] != null) {
             start = bingoCells[account];
-            mainX = $('img[data-id="' + start + '"]').attr("data-location-x");
-            mainY = $('img[data-id="' + start + '"]').attr("data-location-y");
+            let mainX = $('img[data-id="' + start + '"]').attr("data-location-x"),
+                mainY = $('img[data-id="' + start + '"]').attr("data-location-y");
 
-            let mainCell = $('img[data-location-x="' + mainX + '"][data-location-y="' + mainY + '"]').attr("data-color"),
+            let mainCell = $('img[data-location-x="' + mainX + '"][data-location-y="' + mainY + '"]')
+                    .attr("data-color"),
                 backCellX = $('img[data-location-x="' + (mainX - 1) + '"][data-location-y="' + mainY + '"]')
                     .attr("data-color"),
                 nextCellX = $('img[data-location-x="' + (+mainX + 1) + '"][data-location-y="' + mainY + '"]')
@@ -68,54 +71,44 @@ $(document).ready(function() {
 
             if (mainCell == backCellX) {
                 bingoCells.push(leftCellId);
-
-                bingoCells = bingoCells.filter(function (item, pos) {
-                    return bingoCells.indexOf(item) == pos;
-                });
-
-                console.log(bingoCells);
-                console.log("BingoLeft");
             }
+
             if (mainCell == nextCellX) {
                 bingoCells.push(rightCellId);
-
-                bingoCells = bingoCells.filter(function (item, pos) {
-                    return bingoCells.indexOf(item) == pos;
-                });
-
-                console.log(bingoCells);
-                console.log("BingoRight");
             }
+
             if (mainCell == backCellY) {
                 bingoCells.push(topCellId);
-
-                bingoCells = bingoCells.filter(function (item, pos) {
-                    return bingoCells.indexOf(item) == pos;
-                });
-
-                console.log(bingoCells);
-                console.log("BingoTop");
             }
+
             if (mainCell == nextCellY) {
                 bingoCells.push(buttomCellId);
-
-                bingoCells = bingoCells.filter(function (item, pos) {
-                    return bingoCells.indexOf(item) == pos;
-                });
-
-                console.log(bingoCells);
-                console.log("BingoButtom");
             }
 
-            // bingoCells = bingoCells.filter(function (item, pos) {
-            //     return bingoCells.indexOf(item) == pos;
-            // });
+            bingoCells = bingoCells.filter(function (item, pos) {
+                return bingoCells.indexOf(item) == pos;
+            });
 
             account++;
-            end = bingoCells[bingoCells.length - 1];
-            console.log(bingoCells[account]);
-            console.log(end);
-       }
+        }
+
+        return bingoCells;
     };
+
+    function deletCells(arCells) {
+        let maxCells = arCells.length;
+
+        if (maxCells > 1) {
+            for (let i = 0; i < maxCells; i++) {
+                let start = arCells[i];
+
+                let deletCell = $('img[data-id="' + start + '"]').attr("src", "null").attr("data-color", "null");
+                $("#box_cell").append(deletCell);
+            }
+            console.log(maxCells);
+            // return deletCell;
+        }
+    };
+
 });
 
