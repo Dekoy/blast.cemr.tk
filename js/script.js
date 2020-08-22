@@ -1,9 +1,9 @@
 $(document).ready(function () {
     let clickImg, searchCells;
-    let row = 4, column = 5;
+    let row = 4, column = 5, sumBurn = 1;
 
 
-    $("#box_cell").css({'width' : column * 100});
+    $("#box_cell").css({'width': column * 100});
 
 
     $("#start").click(function () {
@@ -20,10 +20,51 @@ $(document).ready(function () {
                 k++;
             }
         }
+
+        let bingoMax = checkSomeCells();
+        console.log(bingoMax);
+
     });
 
-    randomColor = function(img){
-        let random = Math.floor(Math.random() * 4);
+    checkSomeCells = function () {
+        let maxCells = row * column;
+        let bingoMaxCells = [];
+
+        for (let i = 0; i < maxCells; i++) {
+            let searchBingo = searchCells(i);
+            searchBingo.splice(0, 1);
+            searchBingo.sort();
+            let maxCells = searchBingo.length;
+
+            if (maxCells > sumBurn) {
+                bingoMaxCells.push(searchBingo);
+            }
+
+            let j = bingoMaxCells.length;
+
+            if (j > 1) {
+                for (let l = 0; l < j; l++) {
+                    for (let k = 0; k < j; k++) {
+                        if(l!=k) {
+                            let doubl1 = parseInt(bingoMaxCells[l]),
+                                doubl2 = parseInt(bingoMaxCells[k]);
+
+                            if (doubl1 == doubl2) {
+                                bingoMaxCells.splice((l), 1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if(bingoMaxCells.length == 0){
+            console.log("end");
+        }
+        return bingoMaxCells;
+    };
+
+    randomColor = function (img) {
+        let random = Math.floor(Math.random() * 5);
 
         if (random == 0) {
             img.attr("src", "images/blue.jpg").attr("data-color", "blue");
@@ -31,6 +72,8 @@ $(document).ready(function () {
             img.attr("src", "images/red.jpg").attr("data-color", "red");
         } else if (random == 2) {
             img.attr("src", "images/yellow.jpg").attr("data-color", "yellow");
+        } else if (random == 3) {
+            img.attr("src", "images/pink.jpg").attr("data-color", "pink");
         } else {
             img.attr("src", "images/green.jpg").attr("data-color", "green");
         }
@@ -40,18 +83,19 @@ $(document).ready(function () {
         let n = $(this).attr("data-id"),
             maxCells = row * column;
 
-        //searchCells(n, max, row);
-        //searchCells(n, max, column);
         let arCells = searchCells(n);
         let changeCells = deletCells(arCells);
         let newCells = addCells(changeCells, maxCells);
 
+        let bingoMaxs = checkSomeCells();
+        console.log(bingoMaxs);
+
         // searchCells;
-        // console.log(newCells);
+        // console.log(arCells);
     };
 
     searchCells = function (n) {
-        let bingoCells = new Array(n);//$(n);
+        let bingoCells = [n];//$(n);
         let account = 0;
         let start = bingoCells[account];
 
@@ -109,7 +153,7 @@ $(document).ready(function () {
     function deletCells(arCells) {
         let maxCells = arCells.length;
 
-        if (maxCells > 1) {
+        if (maxCells > sumBurn) {
             for (let i = 0; i < maxCells; i++) {
                 let start = arCells[i];
 
@@ -170,7 +214,7 @@ $(document).ready(function () {
                     })
                         .appendTo($sort);
 
-                    console.log(topCellY);
+                    // console.log(topCellY);
 
                     bool = false;
                 }
