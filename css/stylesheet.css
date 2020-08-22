@@ -1,10 +1,9 @@
 #box_cell{
-    width: 400px;
     background-color: #0000005e;
     border-radius: 10px;
 }
 #box_cell img{
     padding: 2px 2px 0 2px;
     border-radius: 20px;
-    width: calc(25% - 4px);
+    width: calc(20% - 4px);
 }

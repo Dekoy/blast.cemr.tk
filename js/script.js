@@ -1,6 +1,10 @@
 $(document).ready(function () {
     let clickImg, searchCells;
-    let row = 3, column = 4;
+    let row = 4, column = 5;
+
+
+    $("#box_cell").css({'width' : column * 100});
+
 
     $("#start").click(function () {
         $("#box_cell").empty();
@@ -10,15 +14,7 @@ $(document).ready(function () {
             for (let j = 0; j < column; j++) {
                 let img = $("<img>").attr("data-location-x", j).attr("data-location-y", i).attr("data-id", k)
                     .click(clickImg);
-                let random = Math.floor(Math.random() * 3);
-
-                if (random == 0) {
-                    img.attr("src", "images/blue.jpg").attr("data-color", "blue");
-                } else if (random == 1) {
-                    img.attr("src", "images/red.jpg").attr("data-color", "red");
-                } else {
-                    img.attr("src", "images/green.jpg").attr("data-color", "green");
-                }
+                let random = randomColor(img);
 
                 $("#box_cell").append(img);
                 k++;
@@ -26,17 +22,32 @@ $(document).ready(function () {
         }
     });
 
+    randomColor = function(img){
+        let random = Math.floor(Math.random() * 4);
+
+        if (random == 0) {
+            img.attr("src", "images/blue.jpg").attr("data-color", "blue");
+        } else if (random == 1) {
+            img.attr("src", "images/red.jpg").attr("data-color", "red");
+        } else if (random == 2) {
+            img.attr("src", "images/yellow.jpg").attr("data-color", "yellow");
+        } else {
+            img.attr("src", "images/green.jpg").attr("data-color", "green");
+        }
+    };
+
     clickImg = function () {
         let n = $(this).attr("data-id"),
-            mainX = $(this).attr("data-location-x"),
-            mainY = $(this).attr("data-location-y");
+            maxCells = row * column;
 
         //searchCells(n, max, row);
         //searchCells(n, max, column);
         let arCells = searchCells(n);
-        let addCells = deletCells(arCells);
+        let changeCells = deletCells(arCells);
+        let newCells = addCells(changeCells, maxCells);
+
         // searchCells;
-        console.log(arCells);
+        // console.log(newCells);
     };
 
     searchCells = function (n) {
@@ -113,8 +124,58 @@ $(document).ready(function () {
             })
                 .appendTo($sort);
 
-            console.log(maxCells);
+            // console.log(maxCells);
             // return deletCell;
+        }
+    };
+
+    function addCells(deletCells, maxCells) {
+        let bool = false;
+
+        while (bool == false) {
+            bool = true;
+            for (let i = 0; i < maxCells; i++) {
+                let check = $('img[data-id="' + i + '"]').attr("data-color");
+
+                if (check == "null") {
+                    let img = $('img[data-id="' + i + '"]'),
+                        topCellX = $('img[data-id="' + i + '"]').attr("data-location-x"),
+                        topCellY = $('img[data-id="' + i + '"]').attr("data-location-y") - 1;
+
+                    let topCell = $('img[data-location-x="' + topCellX + '"][data-location-y="' + topCellY + '"]')
+                        .attr("data-id");
+
+                    let srcCell = $('img[data-id="' + topCell + '"]').attr("src"),
+                        colorCell = $('img[data-id="' + topCell + '"]').attr("data-color");
+
+
+                    if (topCellY >= 0) {
+                        img = img.attr("src", srcCell).attr("data-color", colorCell);
+
+                        $("#box_cell").append(img);
+
+                        img = $('img[data-id="' + topCell + '"]').attr("src", "images/null.jpg")
+                            .attr("data-color", "null");
+
+                    } else {
+                        let random = randomColor(img);
+                    }
+
+                    $("#box_cell").append(img);
+
+                    let $sort = $('#box_cell');
+
+                    $sort.find('img').sort(function (a, b) {
+                        return +a.dataset.id - +b.dataset.id;
+                    })
+                        .appendTo($sort);
+
+                    console.log(topCellY);
+
+                    bool = false;
+                }
+
+            }
         }
     };
 
