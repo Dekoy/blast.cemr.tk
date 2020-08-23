@@ -3,19 +3,20 @@
 <head>
     <title>FASTPANEL2</title>
     <meta name="robots" content="noindex,nofollow">
-    <link rel="stylesheet" type="text/css" href="css/stylesheet.css" />
+    <link rel="stylesheet" type="text/css" href="css/stylesheet.css"/>
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
     <script src="js/script.js"></script>
 </head>
 <body>
 <h1>Головоломка с механикой Blast</h1>
-<p>Поле с размером N*M</p>
-<p>Цветов C</p>
-<p>Группа избавление K</p>
 <button name="start" id="start">Играть</button>
 <div id="box_status">
 </div>
-<div id="box_cell">
+<div class="box_main">
+    <div id="box_cell"></div>
+    <div class="box_gamesOver">
+        <div class="text_gamesOver"></div>
+    </div>
 </div>
 
 </body>

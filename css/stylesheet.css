@@ -1,9 +1,65 @@
-#box_cell{
+.box_main {
+    position: relative;
+    display: inline-block;
+}
+
+#box_cell {
     background-color: #0000005e;
     border-radius: 10px;
 }
-#box_cell img{
+
+#box_cell img {
     padding: 2px 2px 0 2px;
     border-radius: 20px;
     width: calc(20% - 4px);
 }
+
+.box_gamesOver {
+    display: none;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    border-radius: 10px;
+    background-color: #00000060;
+}
+
+.text_gamesOver {
+    transform: translate(-50%, -50%);
+    background-color: white;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    font-size: 30px;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+/******* Animation *******/
+.shake {
+    animation: shake 0.7s cubic-bezier(.17, .67, .83, .67);
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
+
+@keyframes shake {
+    10%, 90% {
+        transform: translate3d(-1px, 0, 0);
+    }
+
+    20%, 80% {
+        transform: translate3d(2px, 0, 0);
+    }
+
+    30%, 50%, 70% {
+        transform: translate3d(-4px, 0, 0);
+    }
+
+    40%, 60% {
+        transform: translate3d(4px, 0, 0);
+    }
+}
+
+

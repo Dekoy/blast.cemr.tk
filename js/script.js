@@ -1,8 +1,9 @@
 $(document).ready(function () {
-    let clickImg, searchCells;
-    let row = 4, column = 5, sumBurn = 1, maxColors = 6, onlyMixing = 3, MovesEnd = 20;
+    var clickImg, searchCells;
+    var row = 4, column = 5, sumBurn = 1, maxColors = 6, onlyMixing = 2, MovesEnd = 50;
+    var gamePoints = 0, gamePointsWin = 3000;
 
-    let box_check = $("<div>").attr("class", "box_check"),
+    var box_check = $("<div>").attr("class", "box_check"),
         box_mixing = $("<div>").attr("class", "box_mixing"),
         box_moves = $("<div>").attr("class", "box_moves"),
         box_points = $("<div>").attr("class", "box_points");
@@ -12,47 +13,83 @@ $(document).ready(function () {
     $("#box_status").append(box_moves);
     $("#box_status").append(box_points);
 
-    $("#box_cell").css({'width': column * 100});
 
+    $("#box_cell").css({'width': column * 100});
 
     $("#start").click(function () {
         $("#box_cell").empty();
+        $(".box_gamesOver").css({'display': 'none'});
         let k = 0;
 
         for (let i = 0; i < row; i++) {
             for (let j = 0; j < column; j++) {
                 let img = $("<img>").attr("data-location-x", j).attr("data-location-y", i).attr("data-id", k)
                     .click(clickImg);
-                let random = randomColor(img);
+                randomColor(img);
 
                 $("#box_cell").append(img);
                 k++;
             }
         }
-        let displayСheck = displayСheckSomeCells();
-        let displayMixing = displayMixingCells(onlyMixing);
-
+        displayСheckSomeCells();
+        displayMixingCells(onlyMixing);
+        displayMovesEnd();
+        displaGamesPoints(0);
     });
 
+    displayGamesWin = function () {
+        $(".box_gamesOver").css({'display': 'block'});
+        $(".text_gamesOver").html('Game Win');
+    };
+
+    displayGamesOver = function () {
+        $(".box_gamesOver").css({'display': 'block'});
+        $(".text_gamesOver").html('Game Over ');
+    };
+
     displayСheckSomeCells = function () {
-        let bingoMax = checkSomeCells();
+        // let bingoMax = checkSomeCells();
+
+        let bingoMax = checkSomeCells2();
+
+        if (bingoMax.length == 0) {
+            if (onlyMixing == 1) {
+                onlyMixing -= 1;
+                console.log("GamesOver");
+                let GamesOver = displayGamesOver();
+            } else {
+                onlyMixing -= 1;
+
+                mixingCells();
+                displayMixingCells();
+                bingoMax = displayСheckSomeCells();
+            }
+        }
+
         let bingoMaxBox = bingoMax.length;
         $(".box_check").html('<p>Доступных тайтлов: ' + bingoMaxBox + '</p>');
+
+        return bingoMax;
     };
 
-    displayMixingCells = function (newOnlyMixing) {
-        $(".box_mixing").html('<p>Осталось перемешать: ' + newOnlyMixing + '</p>');
+    displayMixingCells = function () {
+        $(".box_mixing").html('<p>Осталось перемешать: ' + onlyMixing + '</p>');
     };
 
-    displayMovesEnd = function(){
-
+    displayMovesEnd = function () {
+        $(".box_moves").html('<p>Осталось ходов: ' + MovesEnd + '</p>');
     };
 
-    displaGamesPoints = function(){
+    displaGamesPoints = function (maxCells) {
+        gamePoints += maxCells * maxCells * 10;
+        $(".box_points").html('<p>Осталось очков: ' + gamePoints + '</p>');
 
+        if (gamePoints >= gamePointsWin) {
+            displayGamesWin();
+        }
     };
 
-    checkSomeCells = function () {
+    checkSomeCells = function () {      //функция отключена
         let maxCells = row * column;
         let bingoMaxCells = [];
 
@@ -85,21 +122,71 @@ $(document).ready(function () {
         }
 
         if (bingoMaxCells.length == 0) {
-            let newOnly = onlyMixing;
+            // let newOnly = onlyMixing;
 
-            if (newOnly == 0) {
-                console.log("Games end!")
+            if (onlyMixing == 1) {
+                let GamesOver = displayGamesOver();
+
             } else {
                 let newBoxCells = mixingCells();
-                //let newOnlyBox = displayMixingCells(newOnly); // ошибка долго думает
+                onlyMixing -= 1;
+                let newOnlyBox = displayMixingCells();          // ошибка долго думает
                 let displayСheck = displayСheckSomeCells();
-                console.log("-------------");
-                console.log(newOnly);
             }
-            console.log(parseInt(onlyMixing));
+
+
         }
 
         return bingoMaxCells;
+    };
+
+    checkSomeCells2 = function () {
+        let maxCells = row * column;
+        let bingoMaxCells = [];
+
+        for (let i = 0; i < maxCells; i++) {
+            let searchBingo = searchCells(i);
+
+            searchBingo.sort();
+
+            if (searchBingo.length > 1) {
+                bingoMaxCells.push(searchBingo);
+            }
+        }
+
+        return unique(bingoMaxCells);
+    };
+
+    function unique(arr) {
+        let result = [];
+
+        for (let str of arr) {
+            let isUnique = true;
+
+            for (let i = 0; i < result.length; i++) {
+                if (result[i][0] == str[0]) {
+                    isUnique = false;
+                    break;
+                }
+            }
+
+            if (isUnique) {
+                result.push(str);
+            }
+        }
+        //
+        // if (result.length == 0) {
+        //     if (onlyMixing == 1) {
+        //         let GamesOver = displayGamesOver();
+        //     } else {
+        //         let newBoxCells = mixingCells();
+        //         onlyMixing -= 1;
+        //         let newOnlyBox = displayMixingCells();
+        //         let displayСheck = displayСheckSomeCells();
+        //     }
+        // }
+
+        return result;
     };
 
     mixingCells = function () {
@@ -164,20 +251,21 @@ $(document).ready(function () {
 
     clickImg = function () {
         let n = $(this).attr("data-id"),
+            nColor = $(this).attr("data-color"),
             maxCells = row * column;
 
         let arCells = searchCells(n);
-        let changeCells = deletCells(arCells);
-        let newCells = addCells(changeCells, maxCells);
+        // console.log(arCells);
+        deletCells(arCells, nColor);
+        let newCells = addCells(maxCells);
 
         let displayСheck = displayСheckSomeCells();
-
         // searchCells;
         // console.log(arCells);
     };
 
     searchCells = function (n) {
-        let bingoCells = [n];//$(n);
+        let bingoCells = [parseInt(n)];//$(n);
         let account = 0;
         let start = bingoCells[account];
 
@@ -207,19 +295,19 @@ $(document).ready(function () {
                     .attr("data-id");
 
             if (mainCell == backCellX) {
-                bingoCells.push(leftCellId);
+                bingoCells.push(parseInt(leftCellId));
             }
 
             if (mainCell == nextCellX) {
-                bingoCells.push(rightCellId);
+                bingoCells.push(parseInt(rightCellId));
             }
 
             if (mainCell == backCellY) {
-                bingoCells.push(topCellId);
+                bingoCells.push(parseInt(topCellId));
             }
 
             if (mainCell == nextCellY) {
-                bingoCells.push(buttomCellId);
+                bingoCells.push(parseInt(buttomCellId));
             }
 
             bingoCells = bingoCells.filter(function (item, pos) {
@@ -232,7 +320,7 @@ $(document).ready(function () {
         return bingoCells;
     };
 
-    function deletCells(arCells) {
+    function deletCells(arCells, nColor) {
         let maxCells = arCells.length;
 
         if (maxCells > sumBurn) {
@@ -250,12 +338,30 @@ $(document).ready(function () {
             })
                 .appendTo($sort);
 
-            // console.log(maxCells);
+            if (MovesEnd == 1) {
+                MovesEnd -= 1;
+                displayMovesEnd();
+                displayGamesOver();
+            } else {
+                MovesEnd -= 1;
+                displayMovesEnd();
+            }
+            displaGamesPoints(maxCells);
+
+            // console.log(nColor);
             // return deletCell;
+        } else {
+            let idCell = $('#box_cell img[data-id="' + arCells[0] + '"]');
+            idCell.addClass('shake')
+            setTimeout(() => {
+                idCell.removeClass('shake');
+            }, 700);
+            console.log("--------");
+            console.log(idCell);
         }
     };
 
-    function addCells(deletCells, maxCells) {
+    function addCells(maxCells) {
         let bool = false;
 
         while (bool == false) {
