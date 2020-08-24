@@ -1,18 +1,17 @@
 $(document).ready(function () {
     var clickImg, searchCells;
-    // var row = 4, column = 5, sumBurn = 1, maxColors = 6, onlyMixing = 2, MovesEnd = 50;
-    // var gamePoints = 0, gamePointsWin = 3000;
     const DEFAULT_SETTINGS = {
         row: 4,
         column: 5,
         sumBurn: 1,
         maxColors: 6,
         onlyMixing: 2,
-        MovesEnd: 500,
+        MovesEnd: 50,
         gamePoints: 0,
-        gamePointsWin: 30000,
+        gamePointsWin: 3000,
         animation: false,
     };
+
     Object.freeze(DEFAULT_SETTINGS);
 
     var settings;
@@ -66,14 +65,12 @@ $(document).ready(function () {
     };
 
     displayСheckSomeCells = function () {
-        // let bingoMax = checkSomeCells();
-
         let bingoMax = checkSomeCells2();
 
         if (bingoMax.length == 0) {
             if (settings.onlyMixing == 0) {
                 console.log("GamesOver");
-                let GamesOver = displayGamesOver();
+                displayGamesOver();
             } else {
                 settings.onlyMixing -= 1;
 
@@ -91,7 +88,6 @@ $(document).ready(function () {
 
     displayMixingCells = function () {
         $(".box_mixing").html('<p>Осталось перемешать: ' + settings.onlyMixing + '</p>');
-
     };
 
     displayMovesEnd = function () {
@@ -115,7 +111,7 @@ $(document).ready(function () {
         }, 700);
     };
 
-    animationDisappear = function (lengthDisappear, idDisappears) {
+    animationDisappear = function (lengthDisappear, idDisappears) {  //функция отключена
         let maxCells = arCells.length;
 
         if (maxCells > settings.sumBurn) {
@@ -149,7 +145,6 @@ $(document).ready(function () {
                 settings.animation = false;
             }, 400);
         }
-
     };
 
     checkSomeCells = function () {      //функция отключена
@@ -240,7 +235,6 @@ $(document).ready(function () {
     };
 
     mixingCells = function () {
-
         let maxCells = settings.row * settings.column;
         let arrCellsId = [];
 
@@ -266,8 +260,6 @@ $(document).ready(function () {
                 newCellSrc = oldCellsSrc[i],
                 newCellColor = oldCellsColor[i];
             let img = $('img[data-id="' + newCellsId + '"]');
-
-            // img = img.attr("src", srcCell).attr("data-color", colorCell);
 
             img = img.attr("src", newCellSrc).attr("data-color", newCellColor);
 
@@ -302,19 +294,15 @@ $(document).ready(function () {
     clickImg = function () {
         if (settings.animation == false) {
             let n = $(this).attr("data-id"),
-                nColor = $(this).attr("data-color"),
                 maxCells = settings.row * settings.column;
 
             let arCells = searchCells(n);
-            // console.log(arCells);
+
             deletCells(arCells);
             addCells(maxCells);
-
             displayСheckSomeCells();
             searchFallCells(arCells);
         }
-        // searchCells;
-        // console.log(arsadaCells);
     };
 
     searchCells = function (n) {
@@ -400,16 +388,8 @@ $(document).ready(function () {
                 displayMovesEnd();
             }
             displaGamesPoints(maxCells);
-
-            // console.log(nColor);
-            // return deletCell;
         } else {
             animationShok(arCells[0]);
-            // let idCell = $('#box_cell img[data-id="' + arCells[0] + '"]');
-            // idCell.addClass('shake')
-            // setTimeout(() => {
-            //     idCell.removeClass('shake');
-            // }, 700);
         }
     };
 
@@ -442,7 +422,7 @@ $(document).ready(function () {
                             .attr("data-color", "null");
 
                     } else {
-                        let random = randomColor(img);
+                        randomColor(img);
                     }
 
                     $("#box_cell").append(img);
@@ -453,8 +433,6 @@ $(document).ready(function () {
                         return +a.dataset.id - +b.dataset.id;
                     })
                         .appendTo($sort);
-
-                    // console.log(topCellY);
 
                     bool = false;
                 }
@@ -489,4 +467,3 @@ $(document).ready(function () {
     };
 
 });
-
