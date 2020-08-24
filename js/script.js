@@ -1,7 +1,23 @@
 $(document).ready(function () {
     var clickImg, searchCells;
-    var row = 4, column = 5, sumBurn = 1, maxColors = 6, onlyMixing = 2, MovesEnd = 50;
-    var gamePoints = 0, gamePointsWin = 3000;
+    // var row = 4, column = 5, sumBurn = 1, maxColors = 6, onlyMixing = 2, MovesEnd = 50;
+    // var gamePoints = 0, gamePointsWin = 3000;
+    const DEFAULT_SETTINGS = {
+        row: 4,
+        column: 5,
+        sumBurn: 1,
+        maxColors: 6,
+        onlyMixing: 2,
+        MovesEnd: 500,
+        gamePoints: 0,
+        gamePointsWin: 30000,
+        animation: false,
+    };
+    Object.freeze(DEFAULT_SETTINGS);
+
+    var settings;
+    settings = Object.assign({}, DEFAULT_SETTINGS);
+
 
     var box_check = $("<div>").attr("class", "box_check"),
         box_mixing = $("<div>").attr("class", "box_mixing"),
@@ -14,15 +30,17 @@ $(document).ready(function () {
     $("#box_status").append(box_points);
 
 
-    $("#box_cell").css({'width': column * 100});
+    $("#box_cell").css({'width': settings.column * 100});
 
     $("#start").click(function () {
+        settings = Object.assign({}, DEFAULT_SETTINGS);
+
         $("#box_cell").empty();
         $(".box_gamesOver").css({'display': 'none'});
         let k = 0;
 
-        for (let i = 0; i < row; i++) {
-            for (let j = 0; j < column; j++) {
+        for (let i = 0; i < settings.row; i++) {
+            for (let j = 0; j < settings.column; j++) {
                 let img = $("<img>").attr("data-location-x", j).attr("data-location-y", i).attr("data-id", k)
                     .click(clickImg);
                 randomColor(img);
@@ -32,7 +50,7 @@ $(document).ready(function () {
             }
         }
         displayСheckSomeCells();
-        displayMixingCells(onlyMixing);
+        displayMixingCells(settings.onlyMixing);
         displayMovesEnd();
         displaGamesPoints(0);
     });
@@ -53,12 +71,11 @@ $(document).ready(function () {
         let bingoMax = checkSomeCells2();
 
         if (bingoMax.length == 0) {
-            if (onlyMixing == 1) {
-                onlyMixing -= 1;
+            if (settings.onlyMixing == 0) {
                 console.log("GamesOver");
                 let GamesOver = displayGamesOver();
             } else {
-                onlyMixing -= 1;
+                settings.onlyMixing -= 1;
 
                 mixingCells();
                 displayMixingCells();
@@ -73,24 +90,70 @@ $(document).ready(function () {
     };
 
     displayMixingCells = function () {
-        $(".box_mixing").html('<p>Осталось перемешать: ' + onlyMixing + '</p>');
+        $(".box_mixing").html('<p>Осталось перемешать: ' + settings.onlyMixing + '</p>');
+
     };
 
     displayMovesEnd = function () {
-        $(".box_moves").html('<p>Осталось ходов: ' + MovesEnd + '</p>');
+        $(".box_moves").html('<p>Осталось ходов: ' + settings.MovesEnd + '</p>');
     };
 
     displaGamesPoints = function (maxCells) {
-        gamePoints += maxCells * maxCells * 10;
-        $(".box_points").html('<p>Осталось очков: ' + gamePoints + '</p>');
+        settings.gamePoints += maxCells * maxCells * 10;
+        $(".box_points").html('<p>Всего очков: ' + settings.gamePoints + '</p>');
 
-        if (gamePoints >= gamePointsWin) {
+        if (settings.gamePoints >= settings.gamePointsWin) {
             displayGamesWin();
         }
     };
 
+    animationShok = function (idShok) {
+        let idCell = $('#box_cell img[data-id="' + idShok + '"]');
+        idCell.addClass('shake')
+        setTimeout(() => {
+            idCell.removeClass('shake');
+        }, 700);
+    };
+
+    animationDisappear = function (lengthDisappear, idDisappears) {
+        let maxCells = arCells.length;
+
+        if (maxCells > settings.sumBurn) {
+
+        }
+        animationDisappear(maxCells, arCells);
+        for (let i = 0; i < lengthDisappear; i++) {
+            let idDisappear = idDisappears[i];
+
+            let idCell = $('#box_cell img[data-id="' + idDisappear + '"]');
+            $("#box_cell").addClass('box_disappear');
+            idCell.addClass('disappear');
+            setTimeout(() => {
+                idCell.removeClass('disappear');
+                $("#box_cell").removeClass('box_disappear');
+            }, 1000);
+        }
+    };
+
+    animationFall = function (idFalls) {
+        let maxFall = idFalls.length;
+        settings.animation = true;
+
+        for (let i = 0; i < maxFall; i++) {
+            let idFall = idFalls[i];
+            let addFall = $('#box_cell img[data-id="' + idFall + '"]');
+
+            addFall.addClass('fall');
+            setTimeout(() => {
+                addFall.removeClass('fall');
+                settings.animation = false;
+            }, 400);
+        }
+
+    };
+
     checkSomeCells = function () {      //функция отключена
-        let maxCells = row * column;
+        let maxCells = settings.row * settings.column;
         let bingoMaxCells = [];
 
         for (let i = 0; i < maxCells; i++) {
@@ -99,7 +162,7 @@ $(document).ready(function () {
             searchBingo.sort();
             let maxCells = searchBingo.length;
 
-            if (maxCells > sumBurn) {
+            if (maxCells > settings.sumBurn) {
                 bingoMaxCells.push(searchBingo);
             }
 
@@ -122,16 +185,14 @@ $(document).ready(function () {
         }
 
         if (bingoMaxCells.length == 0) {
-            // let newOnly = onlyMixing;
-
-            if (onlyMixing == 1) {
-                let GamesOver = displayGamesOver();
+            if (settings.onlyMixing == 1) {
+                displayGamesOver();
 
             } else {
-                let newBoxCells = mixingCells();
-                onlyMixing -= 1;
-                let newOnlyBox = displayMixingCells();          // ошибка долго думает
-                let displayСheck = displayСheckSomeCells();
+                mixingCells();
+                settings.onlyMixing -= 1;
+                displayMixingCells();
+                displayСheckSomeCells();
             }
 
 
@@ -141,7 +202,7 @@ $(document).ready(function () {
     };
 
     checkSomeCells2 = function () {
-        let maxCells = row * column;
+        let maxCells = settings.row * settings.column;
         let bingoMaxCells = [];
 
         for (let i = 0; i < maxCells; i++) {
@@ -174,24 +235,13 @@ $(document).ready(function () {
                 result.push(str);
             }
         }
-        //
-        // if (result.length == 0) {
-        //     if (onlyMixing == 1) {
-        //         let GamesOver = displayGamesOver();
-        //     } else {
-        //         let newBoxCells = mixingCells();
-        //         onlyMixing -= 1;
-        //         let newOnlyBox = displayMixingCells();
-        //         let displayСheck = displayСheckSomeCells();
-        //     }
-        // }
 
         return result;
     };
 
     mixingCells = function () {
 
-        let maxCells = row * column;
+        let maxCells = settings.row * settings.column;
         let arrCellsId = [];
 
         while (arrCellsId.length < maxCells) {
@@ -232,7 +282,7 @@ $(document).ready(function () {
     };
 
     randomColor = function (img) {
-        let random = Math.floor(Math.random() * maxColors);
+        let random = Math.floor(Math.random() * settings.maxColors);
 
         if (random == 0) {
             img.attr("src", "images/blue.jpg").attr("data-color", "blue");
@@ -250,18 +300,21 @@ $(document).ready(function () {
     };
 
     clickImg = function () {
-        let n = $(this).attr("data-id"),
-            nColor = $(this).attr("data-color"),
-            maxCells = row * column;
+        if (settings.animation == false) {
+            let n = $(this).attr("data-id"),
+                nColor = $(this).attr("data-color"),
+                maxCells = settings.row * settings.column;
 
-        let arCells = searchCells(n);
-        // console.log(arCells);
-        deletCells(arCells, nColor);
-        let newCells = addCells(maxCells);
+            let arCells = searchCells(n);
+            // console.log(arCells);
+            deletCells(arCells);
+            addCells(maxCells);
 
-        let displayСheck = displayСheckSomeCells();
+            displayСheckSomeCells();
+            searchFallCells(arCells);
+        }
         // searchCells;
-        // console.log(arCells);
+        // console.log(arsadaCells);
     };
 
     searchCells = function (n) {
@@ -320,10 +373,10 @@ $(document).ready(function () {
         return bingoCells;
     };
 
-    function deletCells(arCells, nColor) {
+    function deletCells(arCells) {
         let maxCells = arCells.length;
 
-        if (maxCells > sumBurn) {
+        if (maxCells > settings.sumBurn) {
             for (let i = 0; i < maxCells; i++) {
                 let start = arCells[i];
 
@@ -338,12 +391,12 @@ $(document).ready(function () {
             })
                 .appendTo($sort);
 
-            if (MovesEnd == 1) {
-                MovesEnd -= 1;
+            if (settings.MovesEnd == 1) {
+                settings.MovesEnd -= 1;
                 displayMovesEnd();
                 displayGamesOver();
             } else {
-                MovesEnd -= 1;
+                settings.MovesEnd -= 1;
                 displayMovesEnd();
             }
             displaGamesPoints(maxCells);
@@ -351,13 +404,12 @@ $(document).ready(function () {
             // console.log(nColor);
             // return deletCell;
         } else {
-            let idCell = $('#box_cell img[data-id="' + arCells[0] + '"]');
-            idCell.addClass('shake')
-            setTimeout(() => {
-                idCell.removeClass('shake');
-            }, 700);
-            console.log("--------");
-            console.log(idCell);
+            animationShok(arCells[0]);
+            // let idCell = $('#box_cell img[data-id="' + arCells[0] + '"]');
+            // idCell.addClass('shake')
+            // setTimeout(() => {
+            //     idCell.removeClass('shake');
+            // }, 700);
         }
     };
 
@@ -406,8 +458,33 @@ $(document).ready(function () {
 
                     bool = false;
                 }
-
             }
+        }
+    };
+
+    function searchFallCells(idFalls) {
+        let maxFall = idFalls.length;
+        let account = 0, start = [];
+
+        if (maxFall > settings.sumBurn) {
+            while (idFalls[account] != null) {
+                start = idFalls[account];
+
+                let xFall = $('img[data-id="' + start + '"]').attr("data-location-x"),
+                    yFall = $('img[data-id="' + start + '"]').attr("data-location-y");
+
+                let topFall = $('img[data-location-x="' + xFall + '"][data-location-y="' + (yFall - 1) + '"]')
+                    .attr("data-id");
+
+                idFalls.push(parseInt(topFall));
+
+                idFalls = idFalls.filter(function (item, pos) {
+                    return idFalls.indexOf(item) == pos;
+                });
+
+                account++;
+            }
+            animationFall(idFalls);
         }
     };
 

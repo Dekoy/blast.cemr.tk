@@ -6,6 +6,7 @@
 #box_cell {
     background-color: #0000005e;
     border-radius: 10px;
+    overflow: hidden
 }
 
 #box_cell img {
@@ -62,4 +63,23 @@
     }
 }
 
+.box_disappear {
+    transition: all 0.3s ease-in-out;
+}
+
+.disappear {
+    transform: scale(0.1);
+}
+
+.fall {
+    animation: fall 0.4s ease-in-out infinite;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
+
+@keyframes fall {
+    0% {transform: translate3d(0, -100px, 0);}
+    90% {transform: translate3d(0, 0, 0);}
+}
 
